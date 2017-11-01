@@ -1,0 +1,94 @@
+
+ssh -i demo.pem ec2-user@ec2-54-210-163-157.compute-1.amazonaws.com
+
+df -h
+lsblk
+
+## Montar Disco Magnético
+sudo mkfs -t ext4 /dev/xvdb
+sudo mkdir /grid
+sudo mount /dev/xvdb grid
+cat /etc/fstab
+sudo vi /etc/fstab
+##### Dentro de etc/fstab
+/dev/xvdb			/grid		ext4		defaults, nofail 0 2
+sudo reboot
+
+## Selinux
+sudo vi /etc/sysconfig/selinux
+#####
+disabled
+
+## Firewald
+systemctl status firewalld
+
+## NTP 
+sudo yum install ntp
+sudo systemctl enable ntpd
+
+## Iptables
+sudo iptables -L -n
+sudo service iptables stop
+
+## umask
+sudo vi /etc/profile
+#####
+umask 022
+
+## Agregar usuarios
+sudo groupadd hadoop
+sudo useradd hduser -g hadoop
+sudo visudo
+#####
+hduser 		ALL = (ALL) 	NOPASSWD: ALL
+cloudera-scm 	ALL= (ALL) 	NOPASSWD: ALL
+
+## Generación de Llaves
+sudo su hduser
+cd /home/hduser
+ssh-keygen
+pwd
+cd .ssh
+ls -lstr
+cat id_rsa.pub >> authorized_keys
+vi id_rsa.pub 
+
+
+## Imagen
+sudo mkfs -t ext4 /dev/xvdb
+sudo mkdir /grid
+sudo mount /dev/xvdb grid
+	
+## Acceso a nodos
+ssh -i demo.pem ec2-user@ec2-54-173-47-38.compute-1.amazonaws.com
+ssh -i demo.pem ec2-user@ec2-52-87-222-93.compute-1.amazonaws.com
+ssh -i demo.pem ec2-user@ec2-54-242-205-126.compute-1.amazonaws.com
+ssh -i demo.pem ec2-user@ec2-54-145-240-146.compute-1.amazonaws.com
+
+## Agrega hosts
+sudo vi /etc/hosts
+
+54-173-47-38	ec2-54-173-47-38.compute-1.amazonaws.com	CDH5-Manager
+52-87-222-93	ec2-52-87-222-93.compute-1.amazonaws.com	CDH5-Node01
+54-242-205-126	ec2-54-242-205-126.compute-1.amazonaws.com	CDH5-Node02
+54-145-240-146	ec2-54-145-240-146.compute-1.amazonaws.com	CDH5-Node03
+
+
+## Modifica las llaves y llaves autorizadas
+sudo su hduser
+cd /home/hduser/.ssh
+vi id_rsa.pub
+vi authorized_keys
+
+·· Cambia las direcciones ip
+
+10.0.0.68
+10.0.0.120
+10.0.0.91
+10.0.0.150
+
+ssh hduser@localhost
+ssh hduser@10.0.0.120
+ssh hduser@10.0.0.91
+ssh hduser@10.0.0.150
+
