@@ -1,44 +1,50 @@
 
-ssh -i demo.pem ec2-user@ec2-54-210-163-157.compute-1.amazonaws.com
+#!/bin/bash
 
-df -h
-lsblk
+# El original es de DGadiraju
+# https://github.com/dgadiraju/code/blob/master/hadoop/administration/hortonworks/scripts/04setup_cluster/prepareNode.sh
 
-## Montar Disco Magnético
-sudo mkfs -t ext4 /dev/xvdb
-sudo mkdir /grid
-sudo mount /dev/xvdb grid
-cat /etc/fstab
-sudo vi /etc/fstab
-##### Dentro de etc/fstab
-/dev/xvdb			/grid		ext4		defaults, nofail 0 2
-sudo reboot
+ssh -i demo.pem ec2-user@ec2-34-237-128-86.compute-1.amazonaws.com
 
-## Selinux
-sudo vi /etc/sysconfig/selinux
-#####
-disabled
+# umask
+echo -e “\nSetting Umask to 022 in .bashrc"
+umask 022
+echo “umask 022” >> ~/.bashrc
 
-## Firewald
-systemctl status firewalld
+# Deshabitar SELinux
+echo -e “\nSetting Umask to 022 in .bashrc"
+sudo sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 
-## NTP 
+# Habilitar NTP
+echo -e “\nInstalación de NTP”
 sudo yum install ntp
 sudo systemctl enable ntpd
 
-## Iptables
+# Deshabita IPTables
 sudo iptables -L -n
 sudo service iptables stop
 
-## umask
-sudo vi /etc/profile
-#####
-umask 022
+# Ajusta Swapiness
+echo -e "\nSetting Swapiness to 0"
+echo 0 | sudo tee /proc/sys/vm/swappiness
+echo vm.swappiness = 0 | sudo tee -a /etc/sysctl.conf
+
+#Agrega límites de Manejo de Archivos
+echo -e "\nSetting File Handle Limits"
+sudo -- sh -c 'echo hdfs - nofile 32768 >> /etc/security/limits.conf'
+sudo -- sh -c 'echo mapred - nofile 32768 >> /etc/security/limits.conf'
+sudo -- sh -c 'echo hbase - nofile 32768 >> /etc/security/limits.conf'
+sudo -- sh -c 'echo hdfs - nproc 32768 >> /etc/security/limits.conf'
+sudo -- sh -c 'echo mapred - nproc 32768 >> /etc/security/limits.conf'
+sudo -- sh -c 'echo hbase - nproc 32768 >> /etc/security/limits.conf'
+
 
 ## Agregar usuarios
 sudo groupadd hadoop
 sudo useradd hduser -g hadoop
-sudo visudo
+sudo useradd cloudera-scm -g hadoop
+
+sudo visado
 #####
 hduser 		ALL = (ALL) 	NOPASSWD: ALL
 cloudera-scm 	ALL= (ALL) 	NOPASSWD: ALL
@@ -52,27 +58,38 @@ cd .ssh
 ls -lstr
 cat id_rsa.pub >> authorized_keys
 vi id_rsa.pub 
+vi authorized_keys
+# Copia 7 veces la línea
+
+# Crea Imagen
+
+## Carga el archivo demo.pem al nodo master
+scp -i demo.pem demo.pem ec2-user@ec2-34-237-128-86.compute-1.amazonaws.com:~
 
 
-## Imagen
-sudo mkfs -t ext4 /dev/xvdb
-sudo mkdir /grid
-sudo mount /dev/xvdb grid
-	
-## Acceso a nodos
-ssh -i demo.pem ec2-user@ec2-54-173-47-38.compute-1.amazonaws.com
-ssh -i demo.pem ec2-user@ec2-52-87-222-93.compute-1.amazonaws.com
-ssh -i demo.pem ec2-user@ec2-54-242-205-126.compute-1.amazonaws.com
-ssh -i demo.pem ec2-user@ec2-54-145-240-146.compute-1.amazonaws.com
+# Acceso a nodos
+ssh -i demo.pem ec2-user@ec2-34-237-128-86.compute-1.amazonaws.com
+# Desde Manager accede a los demás
+ssh -i demo.pem ec2-user@10.0.0.172
+ssh -i demo.pem ec2-user@10.0.0.179
+ssh -i demo.pem ec2-user@10.0.0.65
 
 ## Agrega hosts
 sudo vi /etc/hosts
+10.0.0.219	ip-10-0-0-219.ec2.internal	CDH53-Manager
+10.0.0.172	ip-10-0-0-172.ec2.internal	CDH53-Slave01
+10.0.0.153	ip-10-0-0-153.ec2.internal	CDH53-Slave02
+10.0.0.65	ip-10-0-0-65.ec2.internal	CDH53-Slave03
 
-54-173-47-38	ec2-54-173-47-38.compute-1.amazonaws.com	CDH5-Manager
-52-87-222-93	ec2-52-87-222-93.compute-1.amazonaws.com	CDH5-Node01
-54-242-205-126	ec2-54-242-205-126.compute-1.amazonaws.com	CDH5-Node02
-54-145-240-146	ec2-54-145-240-146.compute-1.amazonaws.com	CDH5-Node03
+sudo -- sh -c 'echo 10-0-0-219 ip-10-0-0-219.ec2.internal CDH53-Manager >> /etc/hosts'
+sudo -- sh -c 'echo 10-0-0-172 ip-10-0-0-172.ec2.internal CDH53-Manager >> /etc/hosts'
+sudo -- sh -c 'echo 10-0-0-179 ip-10-0-0-153.ec2.internal CDH53-Manager >> /etc/hosts'
+sudo -- sh -c 'echo 10-0-0-65 ip-10-0-0-65.ec2.internal CDH53-Manager >> /etc/hosts'
 
+ip-10-0-0-219.ec2.internal
+ip-10-0-0-172.ec2.internal
+ip-10-0-0-153.ec2.internal
+ip-10-0-0-65.ec2.internal
 
 ## Modifica las llaves y llaves autorizadas
 sudo su hduser
@@ -82,13 +99,41 @@ vi authorized_keys
 
 ·· Cambia las direcciones ip
 
-10.0.0.68
-10.0.0.120
-10.0.0.91
-10.0.0.150
+10.0.0.219
+10.0.0.172
+10.0.0.153
+10.0.0.65
 
 ssh hduser@localhost
-ssh hduser@10.0.0.120
-ssh hduser@10.0.0.91
-ssh hduser@10.0.0.150
+ssh hduser@10.0.0.172
+ssh hduser@10.0.0.153
+ssh hduser@10.0.0.65
 
+## Instala wget
+sudo yum install wget
+
+## Descarga Cloudera en Manager
+sudo wget -nv https://archive.cloudera.com/cm5/installer/latest/cloudera-manager-installer.bin
+sudo wget -nv http://archive.cloudera.com/cdh5/redhat/7/x86_64/cdh/RPM-GPG-KEY-cloudera
+sudo chmod +x ./cloudera-manager-installer.bin
+sudo ./cloudera-manager-installer.bin
+
+
+## Revisa los logs de la instalación
+cd /var/log/cloudera-manager-installer
+
+
+## Ingresa las direcciones ip de Nodos y Manager
+ip-10-0-0-68.ec2.internal
+ip-10-0-0-120.ec2.internal
+ip-10-0-0-91.ec2.internal
+ip-10-0-0-150.ec2.internal
+
+## Extraer llave para Manager CDH5
+sudo su hduser
+cd /home/hduser/.ssh
+cat id_rss
+
+# En terminal mac
+vi id_rsa
+Pegar la llave y guardar
