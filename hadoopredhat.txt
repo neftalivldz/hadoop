@@ -1,0 +1,215 @@
+# Instalación de Java
+sudo yum install java-1.8.0-openjdk-devel
+java -version
+sudo update-alternatives --config java
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.151-1.b12.el7_4.x86_64
+export PATH=$JAVA_HOME/bin:${PATH}
+
+# Agrega el grupo Hadoop
+sudo groupadd hadoop
+
+# Agrega los usuarios
+sudo adduser hduser -g hadoop
+sudo adduser yarn -g hadoop
+sudo adduser hdfs -g hadoop
+sudo adduser mapred -g hadoop 
+
+# Configura Certificados
+sudo su hduser
+cd /home/hduser
+ssh-keygen -t rsa -P “”
+cd .ssh
+ls -lstr
+cat id_rsa.pub >> authorized_keys
+ssh localhost
+
+# Permisos sudo
+sudo visudo
+##
+  hduser 		ALL = (ALL) 	NOPASSWD: ALL
+
+# Instala wget y descarga hadoop o carga el archivo en el usb
+sudo yum install wget
+wget http://www-us.apache.org/dist/hadoop/common/hadoop-2.7.4/hadoop-2.7.4.tar.gz
+cd /usr/local
+sudo mkdir hadoop
+cd /home/hduser/hadoop-2.7.4
+sudo mv * /usr/local
+sudo chown -R hduser:hadoop /usr/local/hadoop
+
+
+1. Variables de Ambiente
+sudo vi /etc/rc.local
+
+#HADOOP VARIABLES
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.151-1.b12.el7_4.x86_64
+export HADOOP_INSTALL=/usr/local/hadoop
+export PATH=$JAVA_HOME/bin:${PATH}
+export PATH=$PATH:$HADOOP_INSTALL/bin
+export PATH=$PATH:$HADOOP_INSTALL/sbin
+export HADOOP_MAPRED_HOME=$HADOOP_INSTALL
+export HADOOP_COMMON_HOME=$HADOOP_INSTALL
+export HADOOP_HDFS_HOME=$HADOOP_INSTALL
+export YARN_HOME=$HADOOP_INSTALL
+export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_INSTALL/lib/native
+export HADOOP_OPTS="-Djava.library.path=$HADOOP_INSTALL/lib"
+#HADOOP VARIABLES END
+
+sudo chmod +x /etc/rc.d/rc.local
+
+2 Configura el archivo hadoop-env.sh
+vi /usr/local/hadoop/etc/hadoop/hadoop-env.sh
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.151-1.b12.el7_4.x86_64
+export HADOOP_HEAPSIZE=“1000”
+export HADOOP_NAMENODE_INIT_HEAPSIZE=“1000”
+export HADOOP_CONF_DIR=$HADOOP_CONF_DIR:-“/var/hadoop”}
+
+3 Configuración de  core-site.xml
+
+sudo mkdir /var/lib/hadoop
+sudo chmod 777 /var/lib/hadoop
+sudo chown hduser:hadoop /var/lib/hadoop
+
+vi /usr/local/hadoop/etc/hadoop/core-site.xml
+<configuration>
+ <property>
+  <name>hadoop.tmp.dir</name>
+  <value>/var/lib/hadoop</value>
+  <description>A base for other temporary directories.</description>
+ </property>  <property>
+  <name>fs.default.name</name>
+  <value>hdfs://localhost:9000</value>
+  <description>The name of the default file system.  A URI whose scheme and authority determine the FileSystem implementation.  The uri's scheme determines the config property (fs.SCHEME.impl) naming the FileSystem implementation class.  The uri's authority is used to determine the host, port, etc. for a filesystem.</description>
+ </property> <property>
+  <name>hadoop.http.staticuser.user</name>
+  <value>hduser</value>
+  <description>Set the name of the default user name to hdfs. </description>
+ </property>
+</configuration>
+ 
+4 Configuración de mapred-site.xml
+cp /usr/local/hadoop/etc/hadoop/mapred-site.xml.template /usr/local/hadoop/etc/hadoop/mapred-site.xml
+
+vi mapred-site.xml
+<configuration>
+  <property>
+    <name>mapreduce.framework.name</name>
+    <value>yarn</value>
+    <description>Map Reduce will run as a Yarn Application
+    </description>
+  </property>
+  <property>
+    <name>mapreduce.jobhistory.intermediate-done-dir</name>
+    <value>/mr-history/tmp</value>
+  </property>
+  <property>
+    <name>mapreduce.jobhistory.done-dir</name>
+    <value>/mr-history/done</value>
+  </property>
+< /configuration>
+
+
+5 Configuración de hdfs-site.xml
+
+sudo mkdir /usr/local/
+sudo mkdir –p /usr/local/hadoop_store/hdfs/namenode
+sudo mkdir –p /usr/local/hadoop_store/hdfs/datanode
+sudo mkdir -p /usr/local/hadoop_store/hdfs/snn
+sudo chown hduser:hadoop /usr/local/hadoop_store
+sudo chown hduser:hadoop /usr/local/hadoop_store/hdfs
+sudo chown hduser:hadoop /usr/local/hadoop_store/hdfs/namenode
+sudo chown hduser:hadoop /usr/local/hadoop_store/hdfs/datanode
+sudo chown hduser:hadoop /usr/local/hadoop_store/hdfs/snn
+chmod g+rwx /usr/local/hadoop_store
+chmod g+rwx /usr/local/hadoop_store/hdfs
+chmod g+rwx /usr/local/hadoop_store/hdfs/namenode
+chmod g+rwx /usr/local/hadoop_store/hdfs/datanode
+chmod g+rwx /usr/local/hadoop_store/hdfs/snn
+
+vi /usr/local/hadoop/etc/hadoop/hdfs-site.xml
+<configuration>
+ <property>
+  <name>dfs.replication</name>
+  <value>1</value>
+  <description>Default block replication.
+  The actual number of replications can be specified when the file is created.
+  The default is used if replication is not specified in create time.
+  </description>
+ </property>
+ <property>
+   <name>dfs.namenode.name.dir</name>
+   <value>file:/usr/local/hadoop_store/hdfs/namenode</value>
+ </property>
+ <property>
+   <name>dfs.datanode.data.dir</name>
+   <value>file:/usr/local/hadoop_store/hdfs/datanode</value>
+ </property>
+<property>
+   <name>fs.checkpoint.dir</name>
+   <value>file:/usr/local/hadoop_store/hdfs/snn</value>
+ </property>
+ <property>
+   <name>fs.checkpoint.edits.dir</name>
+   <value>file:/usr/local/hadoop_store/hdfs/snn</value>
+ </property>
+</configuration>
+
+
+
+6 Directorio de logs de YARN
+sudo mkdir /usr/local/hadoop_store/yarn
+sudo chown hduser:hadoop /usr/local/hadoop_store/yarn
+
+
+cd /usr/local/hadoop
+sudo mkdir logs
+sudo chmod g+w logs
+sudo chown hduser:hadoop .
+
+
+vi /usr/local/hadoop/etc/hadoop/yarn-site.xml
+<property>
+   <name>yarn.nodemanager.aux-services</name>
+   <value>mapreduce_shuffle</value>
+ </property>
+ <property>
+   <name>yarn.nodemanager.aux-services.mapreduce.shuffle.class</name>
+   <value>org.apache.hadoop.mapred.ShuffleHandler</value>
+ </property>
+
+
+
+7 Tamaño de Java Heap
+sudo vi /usr/local/hadoop/etc/hadoop/mapred-env.sh
+HADOOP_JOB_HISTORYSERVER_HEAPSIZE=250
+
+sudo vi /usr/local/hadoop/etc/hadoop/yarn-env.sh
+JAVA_HEAP_MAX=Xmx500m
+YARN_HEAPSIZE=500
+
+
+# Formatear Nodos
+cd /usr/local/hadoop/bin
+sudo ./hdfs namenode -format
+
+# Inicia los servicios
+cd /usr/local/hadoop/sbin
+./hadoop-daemon.sh start namenode
+./hadoop-daemon.sh start secondarynamenode
+./hadoop-daemon.sh start datanode
+jps
+
+hdfs dfs -mkdir -p /mr-history/tmp
+hdfs dfs mkdir -p /mr-history/done
+hdfs dfs -chown -R hduser:hadoop
+hdfs dfs -mkdir -p /user/hdfs
+hdfs dfs -mkdir -p /user/hduser
+
+
+./yarn-daemon.sh start resourcemanager
+./yarn-daemon.sh start nodemanager
+./mr-jobhistory-daemon.sh start historyserver
+
+jps
+
+yarn jar /usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.4.jar pi 16 1000
