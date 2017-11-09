@@ -1,7 +1,6 @@
-
 #!/bin/bash
 
-# El original es de DGadiraju
+# El archivo Base es de D Gadiraju
 # https://github.com/dgadiraju/code/blob/master/hadoop/administration/hortonworks/scripts/04setup_cluster/prepareNode.sh
 
 ssh -i demo.pem ec2-user@ec2-34-237-128-86.compute-1.amazonaws.com
@@ -12,7 +11,7 @@ umask 022
 echo “umask 022” >> ~/.bashrc
 
 # Deshabitar SELinux
-echo -e “\nSetting Umask to 022 in .bashrc"
+echo -e “\nSetting Umask to 022 in .bashrc“
 sudo sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 
 # Habilitar NTP
@@ -38,13 +37,23 @@ sudo -- sh -c 'echo hdfs - nproc 32768 >> /etc/security/limits.conf'
 sudo -- sh -c 'echo mapred - nproc 32768 >> /etc/security/limits.conf'
 sudo -- sh -c 'echo hbase - nproc 32768 >> /etc/security/limits.conf'
 
+## Compactación de páginas transparentes gigantes 
+
+sudo -- sh -c 'echo never > /sys/kernel/mm/transparent_hugepage/defrag'
+sudo -- sh -c 'echo never > /sys/kernel/mm/transparent_hugepage/enabled'
+
+sudo vi /etc/rc.local
+sudo -- sh -c 'echo never > /sys/kernel/mm/transparent_hugepage/defrag'
+sudo -- sh -c 'echo never > /sys/kernel/mm/transparent_hugepage/enabled'
+
+chmod +x /etc/rc.d/rc.local
 
 ## Agregar usuarios
 sudo groupadd hadoop
 sudo useradd hduser -g hadoop
 sudo useradd cloudera-scm -g hadoop
 
-sudo visado
+sudo visudo
 #####
 hduser 		ALL = (ALL) 	NOPASSWD: ALL
 cloudera-scm 	ALL= (ALL) 	NOPASSWD: ALL
@@ -66,30 +75,47 @@ vi authorized_keys
 ## Carga el archivo demo.pem al nodo master
 scp -i demo.pem demo.pem ec2-user@ec2-34-237-128-86.compute-1.amazonaws.com:~
 
-
 # Acceso a nodos
 ssh -i demo.pem ec2-user@ec2-34-237-128-86.compute-1.amazonaws.com
 # Desde Manager accede a los demás
-ssh -i demo.pem ec2-user@10.0.0.172
-ssh -i demo.pem ec2-user@10.0.0.179
-ssh -i demo.pem ec2-user@10.0.0.65
+ssh -i demo.pem ec2-user@10.0.0.12
+ssh -i demo.pem ec2-user@10.0.0.13
+ssh -i demo.pem ec2-user@10.0.0.14
+ssh -i demo.pem ec2-user@10.0.0.15
+ssh -i demo.pem ec2-user@10.0.0.16
+ssh -i demo.pem ec2-user@10.0.0.17
+
+
 
 ## Agrega hosts
 sudo vi /etc/hosts
-10.0.0.219	ip-10-0-0-219.ec2.internal	CDH53-Manager
-10.0.0.172	ip-10-0-0-172.ec2.internal	CDH53-Slave01
-10.0.0.153	ip-10-0-0-153.ec2.internal	CDH53-Slave02
-10.0.0.65	ip-10-0-0-65.ec2.internal	CDH53-Slave03
+10.0.0.11	ip-10-0-0-11.ec2.internal	CDH53-Manager01
+10.0.0.12	ip-10-0-0-12.ec2.internal	CDH53-Manager02
+10.0.0.13	ip-10-0-0-13.ec2.internal	CDH53-Manager03
+10.0.0.14	ip-10-0-0-14.ec2.internal	CDH53-Slave01
+10.0.0.15	ip-10-0-0-15.ec2.internal	CDH53-Slave02
+10.0.0.16	ip-10-0-0-16.ec2.internal	CDH53-Slave03
+10.0.0.17	ip-10-0-0-17.ec2.internal	CDH53-Slave04
 
-sudo -- sh -c 'echo 10-0-0-219 ip-10-0-0-219.ec2.internal CDH53-Manager >> /etc/hosts'
-sudo -- sh -c 'echo 10-0-0-172 ip-10-0-0-172.ec2.internal CDH53-Manager >> /etc/hosts'
-sudo -- sh -c 'echo 10-0-0-179 ip-10-0-0-153.ec2.internal CDH53-Manager >> /etc/hosts'
-sudo -- sh -c 'echo 10-0-0-65 ip-10-0-0-65.ec2.internal CDH53-Manager >> /etc/hosts'
 
-ip-10-0-0-219.ec2.internal
-ip-10-0-0-172.ec2.internal
-ip-10-0-0-153.ec2.internal
-ip-10-0-0-65.ec2.internal
+sudo -- sh -c 'echo 10.0.0.11 ip-10-0-0-11.ec2.internal CDH53-Manager01 >> /etc/hosts'
+sudo -- sh -c 'echo 10.0.0.12 ip-10-0-0-12.ec2.internal CDH53-Manager02 >> /etc/hosts'
+sudo -- sh -c 'echo 10.0.0.13 ip-10-0-0-13.ec2.internal CDH53-Manager03 >> /etc/hosts'
+sudo -- sh -c 'echo 10.0.0.14 ip-10-0-0-14.ec2.internal CDH53-Slave01 >> /etc/hosts'
+sudo -- sh -c 'echo 10.0.0.15 ip-10-0-0-15.ec2.internal CDH53-Slave02 >> /etc/hosts'
+sudo -- sh -c 'echo 10.0.0.16 ip-10-0-0-16.ec2.internal CDH53-Slave03 >> /etc/hosts'
+sudo -- sh -c 'echo 10.0.0.17 ip-10-0-0-17.ec2.internal CDH53-Slave04 >> /etc/hosts'
+
+
+
+ip-10-0-0-11.ec2.internal
+ip-10-0-0-12.ec2.internal
+ip-10-0-0-13.ec2.internal
+ip-10-0-0-14.ec2.internal
+ip-10-0-0-15.ec2.internal
+ip-10-0-0-16.ec2.internal
+ip-10-0-0-17.ec2.internal
+
 
 ## Modifica las llaves y llaves autorizadas
 sudo su hduser
@@ -99,18 +125,28 @@ vi authorized_keys
 
 ·· Cambia las direcciones ip
 
-10.0.0.219
-10.0.0.172
-10.0.0.153
-10.0.0.65
+10.0.0.11
+10.0.0.12
+10.0.0.13
+10.0.0.14
+10.0.0.15
+10.0.0.16
+10.0.0.17
 
 ssh hduser@localhost
-ssh hduser@10.0.0.172
-ssh hduser@10.0.0.153
-ssh hduser@10.0.0.65
+ssh hduser@10.0.0.12
+ssh hduser@10.0.0.13
+ssh hduser@10.0.0.14
+ssh hduser@10.0.0.15
+ssh hduser@10.0.0.16
+ssh hduser@10.0.0.17
+
 
 ## Instala wget
 sudo yum install wget
+
+
+
 
 ## Descarga Cloudera en Manager
 sudo wget -nv https://archive.cloudera.com/cm5/installer/latest/cloudera-manager-installer.bin
@@ -124,10 +160,15 @@ cd /var/log/cloudera-manager-installer
 
 
 ## Ingresa las direcciones ip de Nodos y Manager
-ip-10-0-0-68.ec2.internal
-ip-10-0-0-120.ec2.internal
-ip-10-0-0-91.ec2.internal
-ip-10-0-0-150.ec2.internal
+ip-10-0-0-11.ec2.internal
+ip-10-0-0-12.ec2.internal
+ip-10-0-0-13.ec2.internal
+ip-10-0-0-14.ec2.internal
+ip-10-0-0-15.ec2.internal
+ip-10-0-0-16.ec2.internal
+ip-10-0-0-17.ec2.internal
+
+
 
 ## Extraer llave para Manager CDH5
 sudo su hduser
