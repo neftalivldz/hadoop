@@ -1,0 +1,169 @@
+# Instalación de MariaDB
+sudo yum -y install mariadb-server mariadb
+sudo systemctl start mariadb.service
+sudo systemctl enable mariadb.service
+systemctl status mariadb.service
+/usr/bin/mysql_secure_installation
+— Set root password? Y
+— Password: 
+— Remove anonymous users? Y
+— Disallow root login remotely? n
+— Remove test database and access to it? Y
+— Reload privilege tables now? Y
+
+# Genera la base de datos que se utilizará con Hive.
+mysql -u root -p
+create database hive;
+create user hive identified by ‘hive’;
+gran all on hive.* to hive;
+flush privileges;
+exit;
+
+# Verifica las bases de datos asociadas a Hive
+mysql -u hive -p
+show databases
+
+#Instalación de conector en el nodo donde se instalará Hive
+sudo yum -y install mysql-connector-java
+
+# Posterior a la instalación de Hive desde MySql
+show databases
+use hive;
+show tables;
+
+
+# Revisa HDFS lo creado en el usuario Hive
+hdfs dfs -ls /user
+hdfs dfs -ls /user/hive
+
+# Revisa los procesos a Hive
+ps -fu hive
+
+
+## Instalación OOZIE
+# Genera la base de datos que se utilizará con Oozie.
+mysql -u root -p
+create database oozie;
+create user oozie identified by 'oozie';
+grant all on oozie.* to oozie;
+flush privileges;
+exit;
+
+# Verifica las bases de datos asociadas a Oozie
+mysql -u oozie -p
+show databases
+
+sudo yum -y install mysql-connector-java
+
+Puerto 3306
+
+## Instalación Hue
+# Genera la base de datos que se utilizará con Oozie.
+mysql -u root -p
+create database hue;
+create user hue identified by ‘hue’;
+grant all on hue.* to hue;
+flush privileges;
+exit;
+
+# Verifica las bases de datos asociadas a Oozie
+mysql -u hue -p
+show databases
+
+# En la máquina donde se instala Hue
+sudo yum -y install mysql-connector-java
+
+Puerto 3306
+
+
+
+
+## Kerberos
+sudo yum install krb5-server krb5-libs krb5-workstation
+
+vi /etc/krb5.conf 
+#Cambiar EXAMPLE.COM 
+hostname -f
+# kdc= ec2..amazon.com
+admin_server = ec2..
+
+kdb5_util create -s
+password: kerberos
+
+systemctl start krb5kdc
+systemctl start kadmin 
+service krb5kdc restart
+service kadmin restart
+chkconfig krb5kdc on
+chkconfig kadmin on
+
+kadmin.local -q “addprinc admin/admin”
+
+vi /var/kerberos/krb5kdc/kadm5.acl
+#Cambiar a EXAMPLE.COM
+
+service kadmin restart
+service krb5kdc restart
+
+kadmin -p admin/admin@EXAMPLE.COM
+# Dentro de admin
+listprincs
+addprincipal
+addprinc testuser
+
+# Instala en el resto de los nodos
+sudo yum install krb5-libs krb5-workstation
+
+
+#Cloudera Manager
+#Security
+#Enable Kerberos
+1
+All Ok
+2
+MIT KDC
+Host:
+(hostname -f)
+3
+Manage through Cloudera
+4
+admin/admin @ HADOOP.COM
+Pwd: admin
+7
+Restart
+
+kadmin -p admin/admin@EXAMPLE.COM
+modprinc -maxrenewlife 90dat krbtgt/EXAMPLE.COM@EXAMPLE.COM
+modprinc -maxrenewlife 90dat +allow_renewable hue/ip-10-0-0-11.ec2.internal@EXAMPLE.COM
+
+## Prueba Kerberos
+sudo su hdfs
+hdfs dfs -ls /user
+
+cd /var/run/cloudera-scm-agent/process
+ls -lrt
+cd utlimo-JOURNALNODE
+cp hdfs.keytab /home/hduser
+chown hduser /home/hduser/hdfs.keytab
+
+klist -kt FILE:hdfs.keytab
+kinit -kt hdfs.keytab hdfs/ip-10-0-0-11.ec2.internal@EXAMPLE.COM
+
+# Con permisos
+hdfs dfs -mkdir /user/abc
+whoami
+hdfs dfs -ls 
+
+# Sentry
+## Instalación Sentry
+# Genera la base de datos que se utilizará con Sentry.
+mysql -u root -p
+create database sentry;
+create user sentry identified by ‘sentry’;
+grant all on sentry.* to sentry;
+flush privileges;
+exit;
+
+# Verifica las bases de datos asociadas a Sentry
+mysql -u sentry -p
+show databases
