@@ -6,6 +6,8 @@ Se instala el repositorio de mysql workbench
 wget http://archives.fedoraproject.org/pub/archive/epel/6.2017-11-07/i386/epel-release-6-8.noarch.rpm
 rpm -ivh epel-release-6-8.noarch.rpm
 
+https://dev.mysql.com/downloads/repo/yum/
+
 shell> yum repolist
 
 Instala mysql Workbench
