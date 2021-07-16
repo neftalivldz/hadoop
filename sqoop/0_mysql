@@ -1,0 +1,39 @@
+mysql -u root -p
+cloudera
+
+show databases;
+
+exit
+
+mysql -u retail_dba -p
+cloudera
+
+show databases;
+use retail_db;
+show tables;
+
+
+https://github.com/dgadiraju/data
+
+mysql -u root -p
+cloudera
+GRANT ALL PRIVILEGES ON *.* TO 'retail_dba'@'localhost';
+
+ALTER USER 'retail_dba'@'localhost' IDENTIFIED BY 'cloudera';
+SET PASSWORD FOR 'retail_dba'@'localhost' = PASSWORD('cloudera');
+
+mysql -u retail_dba -p
+cloudera
+show databases;
+CREATE DATABASE hr_db;
+
+mysql -u retail_dba -p cloudera hr_db < hr.sql
+
+use hr_db;
+show tables;
+
+select * from employees;
+
+
+
+

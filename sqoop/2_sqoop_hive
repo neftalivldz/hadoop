@@ -1,0 +1,75 @@
+
+hive
+create database db_sqp_import;
+show databases;
+use db_sqp_import;
+create table t_test (i int);
+insert into table t_test values(1);
+select * from t_test;
+drop table t_test;
+
+sqoop import \
+  --connect jdbc:mysql://localhost/retail_db \
+  --username retail_dba \
+  --password cloudera \
+  --table orders \
+  --hive-import \
+  --hive-database db_sqp_import \
+  --hive-table orders_items \
+  --num-mappers 2
+
+hdfs dfs -rm -R /user/cloudera/orders
+hdfs dfs -ls /user/cloudera
+
+vuelve a correr
+
+hive
+describe order_items;
+describe formatted order_items;
+
+## Permite importar todas las tablas de una base de datos.
+
+hdfs dfs -rm -R /User/Cloudera/retail_db
+
+sqoop import-all-tables \
+  --connect jdbc:mysql://localhost/retail_db \
+  --username retail_dba \
+  --password cloudera \
+  --warehouse-dir /user/cloudera/retail_db \
+  --autoreset-to-one-mapper
+
+hdfs dfs -ls /user/cloudera/retail_db
+
+sqoop import \
+  --connect jdbc:mysql://localhost/retail_db \
+  --username retail_dba \
+  --password cloudera \
+  --table orders \
+  --hive-import \
+  --hive-database orders \
+  --hive-table order_items \
+  --hive-overwrite \
+  --num-mappers 2
+
+sqoop import \
+  --connect jdbc:mysql://localhost/retail_db \
+  --username retail_dba \
+  --password cloudera \
+  --table order_items \
+  --hive-import \
+  --hive-database orders \
+  --hive-table orders \
+  --hive-overwrite \
+  --num-mappers 2
+
+
+create table daily_revenue as 
+select order_date, sum(order_item_subtotal) daily_total
+from orders join order_items on 
+order_id = order_item_order_id
+where order_date like '2013-07%'
+group by order_date;
+
+select * from daily_revenue;
+
+

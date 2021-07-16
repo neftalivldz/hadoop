@@ -1,0 +1,22 @@
+
+Para conocer la version de linux con la que trabajamos
+shell> lsb_release -a
+
+Se instala el repositorio de mysql workbench
+shell> wget http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
+shell> rpm -ivh epel-release-6-8.noarch.rpm
+
+shell> yum repolist
+
+Instala mysql Workbench
+
+sudo yum install mysql-community-release-el7-5.noarch.rpm
+sudo yum install epel-release
+sudo yum install proj
+sudo yum install tinyxml
+sudo yum install libzip
+sudo yum install mysql-workbench-community
+
+Centos 6.7
+shell> sudo yum install mysql-workbench-community-6.2.5-1.el6.x86_64.rpm
+

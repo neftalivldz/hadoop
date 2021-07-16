@@ -1,0 +1,206 @@
+## Exportar tablas
+Debemos tener la tabla creada previo a exportarla
+
+mysql -u retail_dba -p
+cloudera
+
+show databases;
+
+create database retail_export;
+
+use retail_export;
+
+create table daily_revenue(
+order_date varchar(30),
+revenue float
+);
+
+exit;
+
+hive
+
+show databases;
+use orders;
+show tables;
+describe order_items;
+describe formatted order_items;
+
+sqoop export \
+  --connect jdbc:mysql://localhost/retail_export \
+  --username retail_dba \
+  --password cloudera \
+  --table daily_revenue \
+  --export-dir /user/hive/warehouse/orders.db/daily_revenue \
+  --input-fields-terminated-by "\001"
+
+insert into daily_revenue values (?,?)
+
+mysql
+
+create table daily_revenue_demo (
+  revenue float,
+  order_date varchar(30),
+  description varchar(200)
+);
+
+
+sqoop export \
+  --connect jdbc:mysql://localhost/retail_export \
+  --username retail_dba \
+  --password cloudera \
+  --table daily_revenue_demo \
+  --export-dir /user/hive/warehouse/orders.db/daily_revenue \
+  --input-fields-terminated-by "\001"
+
+http://quickstart.cloudera:8088/proxy/application_1533746050042_0019/
+
+sqoop export \
+  --connect jdbc:mysql://localhost/retail_export \
+  --username retail_dba \
+  --password cloudera \
+  --table daily_revenue_demo \
+  --columns revenue,order_date \
+  --export-dir /user/hive/warehouse/orders.db/daily_revenue \
+  --input-fields-terminated-by "\001"
+
+insert into daily_revenue_demo (reveue, order_date) values (?,?)
+
+
+drop table daily_revenue_demo;
+
+create table daily_revenue_demo (
+  revenue float,
+  order_date varchar(30),
+  description varchar(200) not null
+);
+
+sqoop export \
+  --connect jdbc:mysql://localhost/retail_export \
+  --username retail_dba \
+  --password cloudera \
+  --table daily_revenue_demo \
+  --columns order_date,revenue \
+  --export-dir /user/hive/warehouse/orders.db/daily_revenue \
+  --input-fields-terminated-by "\001" \
+  --num-mappers 1
+
+http://quickstart.cloudera:8088/proxy/application_1533746050042_0021/
+
+
+drop table daily_revenue_demo;
+
+
+create table daily_revenue (
+  order_date varchar(30) primary key,
+  revenue float
+);
+
+hive
+use orders;
+show tables;
+select * from daily_revenue;
+
+insert into table daily_revenue
+  select order_date, sum(order_item_subtotal) daily_revenue
+  from orders join order_items on
+  order_id = order_item_order_id
+  where order_date like '2013-08%'
+  group by order_date;
+
+sqoop export \
+  --connect jdbc:mysql://localhost/retail_export \
+  --username retail_dba \
+  --password cloudera \
+  --table daily_revenue \
+  --update-key order_date \
+  --export-dir /user/hive/warehouse/orders.db/daily_revenue \
+  --input-fields-terminated-by "\001" \
+  --num-mappers 1
+
+mysql> select * from daily_revenue;
+
+sqoop export \
+  --connect jdbc:mysql://localhost/retail_export \
+  --username retail_dba \
+  --password cloudera \
+  --table daily_revenue \
+  --update-key order_date \
+  --update-mode allowinsert \
+  --export-dir /user/hive/warehouse/orders.db/daily_revenue \
+  --input-fields-terminated-by "\001" \
+  --num-mappers 1
+
+hive
+use orders;
+show tables;
+select * from daily_revenue;
+truncate table daily_revenue;
+select * from daily_revenue;
+
+insert into table daily_revenue
+  select order_date, sum(order_item_subtotal) daily_revenue
+  from orders join order_items on
+  order_id = order_item_order_id
+  group by order_date;
+
+select * from daily_revenue;
+
+mysql
+drop table daily_revenue;
+create table daily_revenue (
+  order_date varchar(30) primary key,
+  revenue float
+);
+insert into daily_revenue values ("2014-07-01 00:00:00.0", 0);
+commit;
+
+sqoop export \
+  --connect jdbc:mysql://localhost/retail_export \
+  --username retail_dba \
+  --password cloudera \
+  --table daily_revenue \
+  --export-dir /user/hive/warehouse/orders.db/daily_revenue \
+  --input-fields-terminated-by "\001"
+
+http://quickstart.cloudera:8088/proxy/application_1533746050042_0029/
+
+## Stage Tables 
+mysql 
+create table daily_revenue_stage (
+  order_date varchar(30) primary key,
+  revenue float
+);
+
+truncate table daily_revenue;
+insert into daily_revenue values ("2014-07-01 00:00:00.0", 0);
+commit;
+
+sqoop export \
+  --connect jdbc:mysql://localhost/retail_export \
+  --username retail_dba \
+  --password cloudera \
+  --table daily_revenue \
+  --staging-table daily_revenue_stage \
+  --export-dir /user/hive/warehouse/orders.db/daily_revenue \
+  --input-fields-terminated-by "\001
+
+truncate table daily_revenue;
+sqoop export \
+  --connect jdbc:mysql://localhost/retail_export \
+  --username retail_dba \
+  --password cloudera \
+  --table daily_revenue \
+  --staging-table daily_revenue_stage \
+  --export-dir /user/hive/warehouse/orders.db/daily_revenue \
+  --input-fields-terminated-by "\001
+
+sqoop export \
+  --connect jdbc:mysql://localhost/retail_export \
+  --username retail_dba \
+  --password cloudera \
+  --table daily_revenue \
+  --staging-table daily_revenue_stage \
+  --clear-staging-table \
+  --export-dir /user/hive/warehouse/orders.db/daily_revenue \
+  --input-fields-terminated-by "\001
+
