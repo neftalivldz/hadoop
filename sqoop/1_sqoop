@@ -22,19 +22,19 @@ sqoop eval \
   --query "SELECT * FROM orders LIMIT 10"
 
 sqoop eval \
-  --connect jdbc:mysql://localhost/retail_export \
+  --connect jdbc:mysql://localhost/retail_db \
   --username retail_dba \
   --password cloudera \
   --query "CREATE TABLE dummy (i INT)"
 
 sqoop eval \
-  --connect jdbc:mysql://localhost/retail_export \
+  --connect jdbc:mysql://localhost/retail_db \
   --username retail_dba \
   --password cloudera \
   --query "INSERT INTO dummy VALUES (1)"
 
 sqoop eval \
-  --connect jdbc:mysql://localhost/retail_export \
+  --connect jdbc:mysql://localhost/retail_db \
   --username retail_dba \
   --password cloudera \
   --query "SELECT * FROM dummy"
