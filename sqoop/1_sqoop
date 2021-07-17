@@ -39,6 +39,12 @@ sqoop eval \
   --password cloudera \
   --query "SELECT * FROM dummy"
 
+## EN CASO DE QUERER BORRAR TABLA
+sqoop eval \
+  --connect jdbc:mysql://localhost/retail_db \
+  --username retail_dba \
+  --password cloudera \
+  --query "DROP TABLE dummy"
 
 sqoop import \
   --connect jdbc:mysql://localhost/retail_db \
