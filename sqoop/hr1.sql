@@ -1,3 +1,5 @@
+CREATE DATABASE hr_db;
+
 use hr_db;
 
 CREATE TABLE regions
