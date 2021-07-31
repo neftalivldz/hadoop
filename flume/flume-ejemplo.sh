@@ -74,5 +74,5 @@ vi flume-data/spool-3
 cat /tmp/kafka-logs/spooled-0/00000000000000000000.log
 
 ## En una nueva terminal - termina kafka
-cd /usr/local/kafka
+cd $KAFKA_HOME
 sudo ./bin/kafka-console-consumer.sh consumer.properties --topic spooled -bootstrap-server localhost:9092 --from-beginning
