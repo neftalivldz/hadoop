@@ -60,7 +60,7 @@ pwd
 mkdir flume-data
 
 cd /home/centos
-vi /flume-data/spool-1
+vi flume-data/spool-1
 {"id":0,"firstName":"tomcy","lastName":"john","dob":"1985-10-20"}{"id":1,"firstName":"rahul","lastName":"dev","dob":"1989-08-15"}{"id":2,"firstName":"pankaj","lastName":"misra","dob":"1982-08-10"}{"id":3,"firstName":"devi","lastName":"lal","dob":"1990-05-06"}{"id":4,"firstName":"john","lastName":"doe","dob":"1992-06-25"}
 
 vi flume-data/spool-2
