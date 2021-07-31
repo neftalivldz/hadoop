@@ -4,7 +4,7 @@ echo $JAVA_HOME
 ## flume 1
 #Instalamos Flume
 wget https://apache.claz.org/flume/1.9.0/apache-flume-1.9.0-bin.tar.gz
-sudo tar -zxvf apache-flume-1.9.0-bin.tar
+tar -zxvf apache-flume-1.9.0-bin.tar
 cd apache-flume-1.9.0-bin
 export FLUME_HOME=/home/centos/apache-flume-1.9.0-bin
 
@@ -27,7 +27,7 @@ cd ${KAFKA_HOME}
 ## Configuración de Flume
 cd $FLUME_HOME
 pwd
-sudo vi spool-kafka-flume-conf.properties
+vi conf/spool-kafka-flume-conf.properties
 
 agent.sources = spool-source
 agent.sources.spool-source.type=spooldir
@@ -47,7 +47,7 @@ agent.sinks.kafkaSink.channel = memoryChannel
 
 ## En una nueva terminal iniciar Flume
 cd ${FLUME_HOME}
-sudo ./bin/flume-ng agent \
+./bin/flume-ng agent \
 --conf ${FLUME_HOME}/conf/ \
 -f ${FLUME_HOME}/conf/spool-kafka-flume-conf.properties \
 -n agent \
@@ -75,4 +75,4 @@ cat /tmp/kafka-logs/spooled-0/00000000000000000000.log
 
 ## En una nueva terminal - termina kafka
 cd $KAFKA_HOME
-sudo ./bin/kafka-console-consumer.sh consumer.properties --topic spooled -bootstrap-server localhost:9092 --from-beginning
+./bin/kafka-console-consumer.sh consumer.properties --topic spooled -bootstrap-server localhost:9092 --from-beginning
