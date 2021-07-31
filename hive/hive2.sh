@@ -3,7 +3,7 @@ sqoop import \
   --connect jdbc:mysql://localhost/retail_db \
   --username retail_dba \
   --password cloudera \
-  --table order_items \
+  --table customers \
   --warehouse-dir /user/cloudera/retail_db
 
 
