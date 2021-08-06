@@ -87,12 +87,12 @@ select * from customer_new limit 5;
 
 INSERT INTO customer_new select fname, city from customer_new;
 
-CREATE EXTERNAL table customer_brwonsville
+CREATE EXTERNAL table customer_brownsville
 (fname String, lname String, city String);
 
-insert into customer_brwonsville select fname, lname, city from customer;
+insert into customer_brownsville select fname, lname, city from customer;
 
-insert overwrite into customer_brwonsville select fname, lname, city from customer;
+insert overwrite into customer_brownsville select fname, lname, city from customer;
 
 decribe table customer_temp;
 
