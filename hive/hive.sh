@@ -55,22 +55,22 @@ CREATE EXTERNAL TABLE curso
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY ','
 STORED AS TEXTFILE
-LOCATION 'curso.txt';
+LOCATION '/user/cloudera/curso.txt';
 
 CREATE TABLE curso
 (name String, Students INT)
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '|'
 STORED AS TEXTFILE
-LOCATION 'curso_pipe.txt';
+LOCATION '/user/cloudera/curso_pipe.txt';
 
 
 vi curso.txt
-Literatura, 10
-Matemáticas, 22
-Inglés, 14
-Física, 14
-Cómputo, 15
+Literatura,10
+Matemáticas,22
+Inglés,14
+Física,14
+Cómputo,15
 
 LOAD DATA LOCAL INPATH '/home/cloudera/curso.txt' INTO TABLE curso;
 
