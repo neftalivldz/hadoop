@@ -76,7 +76,7 @@ LOAD DATA LOCAL INPATH '/home/cloudera/curso.txt' INTO TABLE curso;
 
 select * from curso;
 
-INSERT INTO curso vlaues(Biología, 30);
+INSERT INTO curso values(Biología, 30);
 
 CREATE EXTERNAL customer_data
 (name STRING, ciudad STRING);
