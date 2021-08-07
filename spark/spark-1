@@ -4,3 +4,8 @@ val ys = xs.map((x: Int) => x * 10.0)
 val input = sc.parallelize(List(1, 2, 3, 4)) 
 val result = input.map(x => x * x) 
 println(result.collect().mkString(",")) 
+
+
+## Filtrar
+val xs = (1 to 100).toList
+val even = xs filter {_ %2 == 0}
