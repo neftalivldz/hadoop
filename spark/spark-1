@@ -6,6 +6,12 @@ val result = input.map(x => x * x)
 println(result.collect().mkString(",")) 
 
 
+## Transformación de flatmap
+val line = "Scala is fun"
+val SingleSpace = " "
+val words = line.split(SingleSpace)
+val arrayOfChars = words flatMap {_.toList}
+
 ## Filtrar
 val xs = (1 to 100).toList
 val even = xs filter {_ %2 == 0}
