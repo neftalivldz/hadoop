@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # primer argumento es la carpeta donde se guardaran los json
 # segundo argumento es el número de archvios
 
