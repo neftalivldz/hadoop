@@ -1,0 +1,19 @@
+mv spark-sql-kafka-0-10_2.12-3.0.2.jar /home/centos/spark-3.0.2-bin-hadoop2.7/jars
+
+sudo yum install python3$ which python3
+
+which pip3
+
+sudo pip3 install pandas
+
+sudo pip3 install kafka-python
+
+export PYSPARK_PYTHON=python3
+
+
+tar -xvf spark-3.1.2-bin-hadoop3.2.tgz 
+
+./bin/kafka-console-consumer.sh consumer.properties --topic spooled -bootstrap-server localhost:9092 --from-beginning
+
+https://mtpradoc.medium.com/procesamiento-de-datos-en-streaming-usando-kafka-y-spark-structured-streaming-10f91b68b402
+

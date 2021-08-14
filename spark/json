@@ -1,0 +1,17 @@
+cd /home/centos
+vi flume-data/spool-1
+{"device_id":0,"timestamp":"2021-10-01 09:01:01","speed":"13.445","accelerometer_x":"-13.123","accelerometer_y":"-33.12","accelerometer_z":"-15.123"}{"device_id":1,"timestamp":"2021-10-01 09:02:01","speed":"12.345","accelerometer_x":"-5.112","accelerometer_y":"-24.09","accelerometer_z":"-13.092"}{"device_id":2,"timestamp":"2021-10-01 09:03:01","speed":"11.445","accelerometer_x":"-0.110","accelerometer_y":"-32.93","accelerometer_z":"-11.736"}{"device_id":3,"timestamp":"2021-10-01 09:04:01","speed":"18.645","accelerometer_x":"-16.87","accelerometer_y":"-25.33","accelerometer_z":"-17.837"}{"device_id":4,"timestamp":"2021-10-01 09:05:01","speed":"15.545","accelerometer_x":"-5.783","accelerometer_y":"-6.12","accelerometer_z":"-6.982"}
+
+vi flume-data/spool-2
+{"device_id":10,"timestamp":"2021-10-01 09:11:01","speed":"23.445","accelerometer_x":"-23.123","accelerometer_y":"-33.12","accelerometer_z":"-15.123"}{"device_id":11,"timestamp":"2021-10-01 09:12:01","speed":"22.345","accelerometer_x":"-35.112","accelerometer_y":"-24.09","accelerometer_z":"-13.092"}{"device_id":12,"timestamp":"2021-10-01 09:13:01","speed":"21.445","accelerometer_x":"-30.110","accelerometer_y":"-32.93","accelerometer_z":"-11.736"}{"device_id":13,"timestamp":"2021-10-01 09:14:01","speed":"28.645","accelerometer_x":"-2.87","accelerometer_y":"-25.33","accelerometer_z":"-17.837"}{"device_id":14,"timestamp":"2021-10-01 09:15:01","speed":"35.545","accelerometer_x":"-15.783","accelerometer_y":"-6.12","accelerometer_z":"-6.982"}
+
+vi flume-data/spool-3
+{"device_id":20,"timestamp":"2021-10-01 09:21:01","speed":"33.445","accelerometer_x":"-3.123","accelerometer_y":"-33.12","accelerometer_z":"-15.123"}{"device_id":21,"timestamp":"2021-10-01 09:22:01","speed":"32.345","accelerometer_x":"-5.112","accelerometer_y":"-24.09","accelerometer_z":"-13.092"}{"device_id":22,"timestamp":"2021-10-01 09:23:01","speed":"31.445","accelerometer_x":"-0.110","accelerometer_y":"-32.93","accelerometer_z":"-11.736"}{"device_id":23,"timestamp":"2021-10-01 09:24:01","speed":"38.645","accelerometer_x":"-6.87","accelerometer_y":"-25.33","accelerometer_z":"-17.837"}{"device_id":24,"timestamp":"2021-10-01 09:25:01","speed":"35.545","accelerometer_x":"-5.783","accelerometer_y":"-6.12","accelerometer_z":"-6.982"}
+
+
+     .add("device_id", LongType()) \
+        .add("timestamp", StringType()) \
+        .add("speed", DoubleType()) \
+        .add("accelerometer_x", DoubleType()) \
+        .add("accelerometer_y", DoubleType()) \
+        .add("accelerometer_z", DoubleType())
