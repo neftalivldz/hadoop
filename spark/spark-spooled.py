@@ -58,7 +58,7 @@ if __name__ == "__main__":
     df_kafka_string_parsed_formatted_timestamped.printSchema()
 
     # Compute average of speed, accelerometer_x, accelerometer_y, and accelerometer_z during 5 minutes
-    # Data comes after 10 minutes will be ignores
+    # Data comes after 10 minutes will be ignored
     df_windowavg = df_kafka_string_parsed_formatted_timestamped.withWatermark("timestamp", "10 minutes").groupBy(
         window(df_kafka_string_parsed_formatted_timestamped.timestamp, "5 minutes"),
         df_kafka_string_parsed_formatted_timestamped.device_id).avg("speed", "accelerometer_x", "accelerometer_y", "accelerometer_z")

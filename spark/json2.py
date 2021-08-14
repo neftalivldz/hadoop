@@ -7,13 +7,14 @@ import datetime
 import json
 import random
 
-n = 100
 x = 0
+n = 200
+device_id = 0
 while x < n:
-  device_id = x + 1
+  device_id += 1
   timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
   speed = 25+(x*5)*random.random()
-  accelerometer_x = 25+((x*-1)*5)*random.random() 
+  accelerometer_x = (device_id*10)+((x*-1)*5)*random.random() 
   accelerometer_y = (10*(n%2))+((x*-1)*2)*random.random()
   accelerometer_z = ((x*-1)*5)*random.random()
   archivo = 'spool-' + str(x)
@@ -25,4 +26,4 @@ while x < n:
     json.dump(texto, f)
   if device_id > 5:
     device_id = 0
-  time.sleep(5)
+  time.sleep(3)
