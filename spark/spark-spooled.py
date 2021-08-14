@@ -1,6 +1,7 @@
 #
 # stateful_streaming_word_count.py
-#
+# basado en https://mtpradoc.medium.com/procesamiento-de-datos-en-streaming-usando-kafka-y-spark-structured-streaming-10f91b68b402
+
 
 # Uso: ./bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2 /home/centos/Documents/spark-spooled.py
 from pyspark.sql import SparkSession
